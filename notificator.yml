@@ -1,4 +1,4 @@
 api:
-  port: ":8080"
+  port: ":8082"
   timeout: 5s
   release: false

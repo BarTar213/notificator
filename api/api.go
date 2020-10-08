@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/BarTar213/go-template/config"
+	"github.com/BarTar213/notificator/config"
 	"github.com/gin-gonic/gin"
 )
 

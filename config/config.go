@@ -9,12 +9,20 @@ import (
 
 type Config struct {
 	Api Api
+	Postgres Postgres
 }
 
 type Api struct {
 	Port    string
 	Timeout time.Duration
 	Release bool
+}
+
+type Postgres struct {
+	Address  string
+	User     string
+	Password string
+	Database string
 }
 
 func NewConfig(fileName string) *Config {

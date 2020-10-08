@@ -6,13 +6,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/BarTar213/go-template/api"
-	"github.com/BarTar213/go-template/config"
+	"github.com/BarTar213/notificator/api"
+	"github.com/BarTar213/notificator/config"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	conf := config.NewConfig("app_name.yml")
+	conf := config.NewConfig("notificator.yml")
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 
 	logger.Printf("%+v\n", conf)

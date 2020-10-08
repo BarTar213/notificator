@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/BarTar213/notificator/config"
+	"github.com/BarTar213/notificator/models"
 	"github.com/go-pg/pg/v10"
 )
 
@@ -17,6 +18,7 @@ type Postgres struct {
 }
 
 type Storage interface {
+	AddTemplate(template *models.Template) error
 }
 
 func NewPostgres(config *config.Postgres) (Storage, error) {

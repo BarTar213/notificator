@@ -39,6 +39,22 @@ func NewApi(options ...func(api *Api)) *Api {
 
 	a.Router.GET("/", a.health)
 
+	templates := a.Router.Group("/templates")
+	{
+		templates.GET("")
+		templates.PUT("")
+		templates.POST("")
+		templates.DELETE("")
+	}
+
+	messages := a.Router.Group("/notification")
+	{
+		messages.GET("")
+		messages.POST("")
+		messages.PATCH("")
+		messages.DELETE("")
+	}
+
 	return a
 }
 

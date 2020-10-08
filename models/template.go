@@ -1,8 +1,8 @@
 package models
 
 type Template struct {
-	ID      int
-	Name    string
-	Message string
-	HTML    bool
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Message string `json:"message"`
+	HTML    bool   `json:"html"`
 }

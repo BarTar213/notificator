@@ -30,7 +30,7 @@ func (p *Postgres) DeleteTemplate(ID int) error {
 func (p *Postgres) ListTemplates() ([]models.Template, error) {
 	templates := make([]models.Template, 0)
 
-	err := p.db.Model(templates).Select()
+	err := p.db.Model(&templates).Select()
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package notifications
+package senders
 
 type Internal struct {
 	TemplateID int

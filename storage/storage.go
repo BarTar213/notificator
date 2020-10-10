@@ -23,6 +23,12 @@ type Storage interface {
 	UpdateTemplate(template *models.Template) error
 	DeleteTemplate(ID int) error
 	ListTemplates() ([]models.Template, error)
+
+	GetNotification(notification *models.Notification) error
+	UpdateNotification(notification *models.Notification) error
+	AddNotification(notification *models.Notification) error
+	DeleteNotification(id int) error
+	ListNotifications() ([]models.Notification, error)
 }
 
 func NewPostgres(config *config.Postgres) (Storage, error) {

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	all    = "*"
+	all = "*"
 )
 
 type Postgres struct {
@@ -18,7 +18,10 @@ type Postgres struct {
 }
 
 type Storage interface {
+	GetTemplate(template *models.Template) error
 	AddTemplate(template *models.Template) error
+	UpdateTemplate(template *models.Template) error
+	DeleteTemplate(ID int) error
 }
 
 func NewPostgres(config *config.Postgres) (Storage, error) {

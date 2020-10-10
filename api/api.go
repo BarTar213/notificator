@@ -5,14 +5,16 @@ import (
 	"net/http"
 
 	"github.com/BarTar213/notificator/config"
+	"github.com/BarTar213/notificator/storage"
 	"github.com/gin-gonic/gin"
 )
 
 type Api struct {
-	Port   string
-	Router *gin.Engine
-	Config *config.Config
-	Logger *log.Logger
+	Port    string
+	Router  *gin.Engine
+	Config  *config.Config
+	Storage storage.Storage
+	Logger  *log.Logger
 }
 
 func WithConfig(conf *config.Config) func(a *Api) {
@@ -24,6 +26,12 @@ func WithConfig(conf *config.Config) func(a *Api) {
 func WithLogger(logger *log.Logger) func(a *Api) {
 	return func(a *Api) {
 		a.Logger = logger
+	}
+}
+
+func WithStorage(storage storage.Storage) func(a *Api) {
+	return func(a *Api) {
+		a.Storage = storage
 	}
 }
 
@@ -39,15 +47,17 @@ func NewApi(options ...func(api *Api)) *Api {
 
 	a.Router.GET("/", a.health)
 
+	th := NewTemplateHandlers(a.Storage, a.Logger)
+
 	templates := a.Router.Group("/templates")
 	{
-		templates.GET("")
-		templates.PUT("")
-		templates.POST("")
-		templates.DELETE("")
+		templates.GET("/:id", th.GetTemplate)
+		templates.PUT("/:id", th.UpdateTemplate)
+		templates.POST("", th.AddTemplate)
+		templates.DELETE("/:id", th.DeleteTemplate)
 	}
 
-	messages := a.Router.Group("/notification")
+	messages := a.Router.Group("/notifications")
 	{
 		messages.GET("")
 		messages.POST("")

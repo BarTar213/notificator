@@ -12,6 +12,7 @@ import (
 
 const (
 	invalidRequestBodyErr = "invalid request body"
+	invalidIdParamErr     = "invalid param - ID"
 )
 
 func handlePostgresError(c *gin.Context, l *log.Logger, err error, resource string) {

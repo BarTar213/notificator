@@ -8,6 +8,7 @@ import (
 
 	"github.com/BarTar213/notificator/api"
 	"github.com/BarTar213/notificator/config"
+	"github.com/BarTar213/notificator/storage"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,9 +22,15 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	postgres, err := storage.NewPostgres(&conf.Postgres)
+	if err != nil {
+		logger.Fatalf("new postgres: %s", err)
+	}
+
 	a := api.NewApi(
 		api.WithConfig(conf),
 		api.WithLogger(logger),
+		api.WithStorage(postgres),
 	)
 
 	go a.Run()

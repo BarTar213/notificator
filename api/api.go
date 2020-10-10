@@ -52,6 +52,7 @@ func NewApi(options ...func(api *Api)) *Api {
 	templates := a.Router.Group("/templates")
 	{
 		templates.GET("/:id", th.GetTemplate)
+		templates.GET("", th.ListTemplates)
 		templates.PUT("/:id", th.UpdateTemplate)
 		templates.POST("", th.AddTemplate)
 		templates.DELETE("/:id", th.DeleteTemplate)

@@ -100,5 +100,11 @@ func (h *TemplateHandlers) DeleteTemplate(c *gin.Context) {
 }
 
 func (h *TemplateHandlers) ListTemplates(c *gin.Context) {
+	templates, err := h.storage.ListTemplates()
+	if err != nil {
+		handlePostgresError(c, h.logger, err, templateResource)
+		return
+	}
 
+	c.JSON(http.StatusOK, templates)
 }

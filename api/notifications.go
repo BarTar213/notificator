@@ -47,22 +47,19 @@ func (h *NotificationHandlers) UpdateNotification(c *gin.Context) {
 		return
 	}
 
-	notification := &models.Notification{}
-	err = c.ShouldBindJSON(notification)
+	read, err := strconv.ParseBool(c.Query("read"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, &models.Response{Error: invalidRequestBodyErr})
+		c.JSON(http.StatusBadRequest, invalidReadParamErr)
 		return
 	}
 
-	notification.ID = id
-
-	err = h.storage.UpdateNotification(notification)
+	err = h.storage.ReadNotification(id, read)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)
 		return
 	}
 
-	c.JSON(http.StatusOK, notification)
+	c.JSON(http.StatusOK, struct{}{})
 }
 
 func (h *NotificationHandlers) AddNotification(c *gin.Context) {

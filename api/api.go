@@ -48,6 +48,7 @@ func NewApi(options ...func(api *Api)) *Api {
 	a.Router.GET("/", a.health)
 
 	th := NewTemplateHandlers(a.Storage, a.Logger)
+	nh := NewNotificationHandlers(a.Storage, a.Logger)
 
 	templates := a.Router.Group("/templates")
 	{
@@ -56,14 +57,16 @@ func NewApi(options ...func(api *Api)) *Api {
 		templates.PUT("/:id", th.UpdateTemplate)
 		templates.POST("", th.AddTemplate)
 		templates.DELETE("/:id", th.DeleteTemplate)
+
+		templates.POST("/:name/send", th.SendFromTemplate)
 	}
 
-	messages := a.Router.Group("/notifications")
+	notifications := a.Router.Group("/notifications")
 	{
-		messages.GET("")
-		messages.POST("")
-		messages.PATCH("")
-		messages.DELETE("")
+		notifications.GET("/:id", nh.GetNotification)
+		notifications.POST("", nh.AddNotification)
+		notifications.PATCH("/:id", nh.UpdateNotification)
+		notifications.DELETE("/:id", nh.DeleteNotification)
 	}
 
 	return a

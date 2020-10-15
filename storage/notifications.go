@@ -6,12 +6,8 @@ func (p *Postgres) GetNotification(notification *models.Notification) error {
 	return p.db.Model(notification).WherePK().Select()
 }
 
-func (p *Postgres) UpdateNotification(notification *models.Notification) error {
-	_, err := p.db.Model(notification).
-		Where("userID=?userID").
-		Set("read=?read").
-		Returning(all).
-		Update()
+func (p *Postgres) ReadNotification(id int, read bool) error {
+	_, err := p.db.ExecOne("UPDATE notifications SET read = ? WHERE id = ?", read, id)
 
 	return err
 }
@@ -21,6 +17,13 @@ func (p *Postgres) AddNotification(notification *models.Notification) error {
 
 	return err
 }
+
+func (p *Postgres) BatchAddNotifications(notifications []*models.Notification) error {
+	_, err := p.db.Model(&notifications).Insert()
+
+	return err
+}
+
 
 func (p *Postgres) DeleteNotification(ID int) error {
 	_, err := p.db.Exec("DELETE FROM templates WHERE id=?", ID)

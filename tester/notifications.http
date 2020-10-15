@@ -1,0 +1,9 @@
+GET http://localhost:8082/notifications/1
+Accept: application/json
+
+###
+
+PATCH http://localhost:8082/notifications/1?read=true
+Accept: application/json
+
+###

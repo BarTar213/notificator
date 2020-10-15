@@ -12,6 +12,12 @@ func (p *Postgres) GetTemplate(template *models.Template) error {
 	return p.db.Model(template).WherePK().Select()
 }
 
+func (p *Postgres) GetTemplateByName(template *models.Template) error {
+	return p.db.Model(template).
+		Where("name = ?name").
+		Select()
+}
+
 func (p *Postgres) UpdateTemplate(template *models.Template) error {
 	_, err := p.db.Model(template).
 		WherePK().

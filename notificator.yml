@@ -7,3 +7,9 @@ postgres:
   user: "postgres"
   password: "admin"
   database: "vimo"
+mail:
+  from: "ViMo movie library"
+  host: "smtp.gmail.com"
+  port: 587
+  username: "username"
+  password: "password"

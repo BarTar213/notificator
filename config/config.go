@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Api Api
+	Api      Api
 	Postgres Postgres
+	Mail     Mail
 }
 
 type Api struct {
@@ -23,6 +24,14 @@ type Postgres struct {
 	User     string
 	Password string
 	Database string
+}
+
+type Mail struct {
+	From     string
+	Host     string
+	Port     int
+	Username string
+	Password string
 }
 
 func NewConfig(fileName string) *Config {

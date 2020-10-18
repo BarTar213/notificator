@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/BarTar213/notificator/email"
 	"github.com/BarTar213/notificator/models"
 	"github.com/BarTar213/notificator/senders"
 	"github.com/BarTar213/notificator/storage"
@@ -22,12 +23,17 @@ const (
 )
 
 type TemplateHandlers struct {
-	storage storage.Storage
-	logger  *log.Logger
+	storage     storage.Storage
+	emailClient email.Client
+	logger      *log.Logger
 }
 
-func NewTemplateHandlers(storage storage.Storage, logger *log.Logger) *TemplateHandlers {
-	return &TemplateHandlers{storage: storage, logger: logger}
+func NewTemplateHandlers(storage storage.Storage, emailCli email.Client, logger *log.Logger) *TemplateHandlers {
+	return &TemplateHandlers{
+		storage:     storage,
+		emailClient: emailCli,
+		logger:      logger,
+	}
 }
 
 func (h *TemplateHandlers) GetTemplate(c *gin.Context) {
@@ -131,27 +137,27 @@ func (h *TemplateHandlers) SendFromTemplate(c *gin.Context) {
 
 	notificationType := c.Query("type")
 	if len(notificationType) == 0 || (notificationType != typeInternal && notificationType != typeEmail) {
-		c.JSON(http.StatusBadRequest, "Query value 'type' should be provided. Possible values are: internal, email")
+		c.JSON(http.StatusBadRequest, &models.Response{Error: "Query value 'type' should be provided. Possible values are: internal, email"})
 		return
 	}
 
 	switch notificationType {
 	case typeInternal:
-		internal := &senders.Internal{}
-		err := c.ShouldBindJSON(internal)
+		sender := &senders.Internal{}
+		err := c.ShouldBindJSON(sender)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, &models.Response{Error: invalidRequestBodyErr})
 			return
 		}
-		go h.SendInternal(internal, template)
+		go h.SendInternal(sender, template)
 	case typeEmail:
-		email := &senders.Email{}
-		err := c.ShouldBindJSON(email)
+		sender := &senders.Email{}
+		err := c.ShouldBindJSON(sender)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, &models.Response{Error: invalidRequestBodyErr})
 			return
 		}
-		//go h.SendEmail(email, template)
+		go h.SendEmail(sender, template)
 	}
 
 	c.JSON(http.StatusAccepted, struct{}{})
@@ -163,6 +169,7 @@ func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *mode
 		h.logger.Printf("template parse: %s", err)
 		return
 	}
+
 	err = sender.Send(h.storage, message)
 	if err != nil {
 		h.logger.Printf("internal sending: %s", err)
@@ -170,15 +177,16 @@ func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *mode
 	}
 }
 
-//func (h *TemplateHandlers) SendEmail(sender *senders.Email, template *models.Template) {
-//	message, title, err := template.Parse(sender.Data)
-//	if err != nil {
-//		h.logger.Printf("template parse: %s", err)
-//		return
-//	}
-//	err = sender.Send(h.storage, message)
-//	if err != nil {
-//		h.logger.Printf("internal sending: %s", err)
-//		return
-//	}
-//}
+func (h *TemplateHandlers) SendEmail(sender *senders.Email, template *models.Template) {
+	message, title, err := template.Parse(sender.Data)
+	if err != nil {
+		h.logger.Printf("template parse: %s", err)
+		return
+	}
+
+	err = sender.Send(h.emailClient, title, message, template.HTML)
+	if err != nil {
+		h.logger.Printf("email sending: %s", err)
+		return
+	}
+}

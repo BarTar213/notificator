@@ -8,6 +8,7 @@ import (
 
 	"github.com/BarTar213/notificator/api"
 	"github.com/BarTar213/notificator/config"
+	"github.com/BarTar213/notificator/email"
 	"github.com/BarTar213/notificator/storage"
 	"github.com/gin-gonic/gin"
 )
@@ -27,10 +28,16 @@ func main() {
 		logger.Fatalf("new postgres: %s", err)
 	}
 
+	emailCli, err := email.New(&conf.Mail)
+	if err != nil {
+		logger.Fatalf("email client: %s", err)
+	}
+
 	a := api.NewApi(
 		api.WithConfig(conf),
 		api.WithLogger(logger),
 		api.WithStorage(postgres),
+		api.WithEmailClient(emailCli),
 	)
 
 	go a.Run()

@@ -47,3 +47,14 @@ Content-Type: application/json
   ],
   "data": {}
 }
+
+###
+POST http://localhost:8082/templates/auth/send?type=email
+Content-Type: application/json
+
+{
+  "recipients": [
+    "hostian123@gmail.com"
+  ],
+  "data": {}
+}

@@ -86,6 +86,12 @@ func (h *TemplateHandlers) AddTemplate(c *gin.Context) {
 		return
 	}
 
+	_, err = template.Parse(map[string]string{})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, &models.Response{Error: "could not parse template"})
+		return
+	}
+
 	err = h.storage.AddTemplate(template)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, templateResource)
@@ -164,7 +170,7 @@ func (h *TemplateHandlers) SendFromTemplate(c *gin.Context) {
 }
 
 func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *models.Template) {
-	message, _, err := template.Parse(sender.Data)
+	message, err := template.Parse(sender.Data)
 	if err != nil {
 		h.logger.Printf("template parse: %s", err)
 		return
@@ -178,13 +184,13 @@ func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *mode
 }
 
 func (h *TemplateHandlers) SendEmail(sender *senders.Email, template *models.Template) {
-	message, title, err := template.Parse(sender.Data)
+	message, err := template.Parse(sender.Data)
 	if err != nil {
 		h.logger.Printf("template parse: %s", err)
 		return
 	}
 
-	err = sender.Send(h.emailClient, title, message, template.HTML)
+	err = sender.Send(h.emailClient, template.Title, message, template.HTML)
 	if err != nil {
 		h.logger.Printf("email sending: %s", err)
 		return

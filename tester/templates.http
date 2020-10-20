@@ -12,9 +12,9 @@ POST http://localhost:8082/templates
 Content-Type: application/json
 
 {
-  "name": "auth",
-  "message": "Thanks for creating account in ViMo service",
-  "HTML": false
+  "name": "mailVerification",
+  "message": "",
+  "HTML": true
 }
 
 ###
@@ -49,12 +49,16 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8082/templates/auth/send?type=email
+POST http://localhost:8082/templates/mailVerification/send?type=email
 Content-Type: application/json
 
 {
   "recipients": [
-    "hostian123@gmail.com"
+    "example@example.com"
   ],
-  "data": {}
+  "data": {
+    "user": "Mateusz",
+    "userId": "2",
+    "code": "1235"
+  }
 }

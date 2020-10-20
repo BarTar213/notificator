@@ -16,39 +16,39 @@ type Template struct {
 	HTML    bool   `json:"html"`
 }
 
-func (t *Template) Parse(data map[string]string) (string, string, error) {
+func (t *Template) Parse(data map[string]string) (string, error) {
 	if t.HTML {
 		return t.parseHTML(data)
 	}
 	return t.parseText(data)
 }
 
-func (t *Template) parseHTML(data map[string]string) (string, string, error) {
+func (t *Template) parseHTML(data map[string]string) (string, error) {
 	tpl, err := htmlTpl.New(t.Name).Parse(t.Message)
 	if err != nil {
-		return utils.EmptyStr, utils.EmptyStr, err
+		return utils.EmptyStr, err
 	}
 
 	var tplBytes bytes.Buffer
 	err = tpl.Execute(&tplBytes, data)
 	if err != nil {
-		return utils.EmptyStr, utils.EmptyStr, err
+		return utils.EmptyStr, err
 	}
 
-	return tplBytes.String(), utils.EmptyStr, nil
+	return tplBytes.String(), nil
 }
 
-func (t *Template) parseText(data map[string]string) (string, string, error) {
+func (t *Template) parseText(data map[string]string) (string, error) {
 	tpl, err := textTpl.New(t.Name).Parse(t.Message)
 	if err != nil {
-		return utils.EmptyStr, utils.EmptyStr, err
+		return utils.EmptyStr, err
 	}
 
 	var tplBytes bytes.Buffer
 	err = tpl.Execute(&tplBytes, data)
 	if err != nil {
-		return utils.EmptyStr, utils.EmptyStr, err
+		return utils.EmptyStr, err
 	}
 
-	return tplBytes.String(), utils.EmptyStr, nil
+	return tplBytes.String(), nil
 }

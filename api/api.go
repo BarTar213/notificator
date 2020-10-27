@@ -1,8 +1,10 @@
 package api
 
 import (
+	"github.com/BarTar213/notificator/models"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/BarTar213/notificator/config"
 	"github.com/BarTar213/notificator/email"
@@ -11,12 +13,14 @@ import (
 )
 
 type Api struct {
-	Port        string
-	Router      *gin.Engine
-	Config      *config.Config
-	Storage     storage.Storage
-	EmailClient email.Client
-	Logger      *log.Logger
+	Port             string
+	Router           *gin.Engine
+	Config           *config.Config
+	Storage          storage.Storage
+	EmailClient      email.Client
+	NotificationPool *sync.Pool
+	TemplatePool     *sync.Pool
+	Logger           *log.Logger
 }
 
 func WithConfig(conf *config.Config) func(a *Api) {
@@ -43,6 +47,26 @@ func WithEmailClient(emailCli email.Client) func(a *Api) {
 	}
 }
 
+func WithNotificationPool() func(a *Api) {
+	return func(a *Api) {
+		a.NotificationPool = &sync.Pool{
+			New: func() interface{} {
+				return new(models.Notification)
+			},
+		}
+	}
+}
+
+func WithTemplatePool() func(a *Api) {
+	return func(a *Api) {
+		a.TemplatePool = &sync.Pool{
+			New: func() interface{} {
+				return new(models.Template)
+			},
+		}
+	}
+}
+
 func NewApi(options ...func(api *Api)) *Api {
 	a := &Api{
 		Router: gin.Default(),
@@ -55,8 +79,8 @@ func NewApi(options ...func(api *Api)) *Api {
 
 	a.Router.GET("/", a.health)
 
-	th := NewTemplateHandlers(a.Storage, a.EmailClient, a.Logger)
-	nh := NewNotificationHandlers(a.Storage, a.Logger)
+	th := NewTemplateHandlers(a.Storage, a.EmailClient, a.TemplatePool, a.Logger)
+	nh := NewNotificationHandlers(a.Storage, a.NotificationPool, a.Logger)
 
 	templates := a.Router.Group("/templates")
 	{
@@ -72,6 +96,7 @@ func NewApi(options ...func(api *Api)) *Api {
 	notifications := a.Router.Group("/notifications")
 	{
 		notifications.GET("/:id", nh.GetNotification)
+		notifications.GET("", nh.ListNotifications)
 		notifications.PATCH("/:id", nh.UpdateNotification)
 		notifications.DELETE("/:id", nh.DeleteNotification)
 	}

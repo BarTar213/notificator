@@ -38,6 +38,8 @@ func main() {
 		api.WithLogger(logger),
 		api.WithStorage(postgres),
 		api.WithEmailClient(emailCli),
+		api.WithNotificationPool(),
+		api.WithTemplatePool(),
 	)
 
 	go a.Run()

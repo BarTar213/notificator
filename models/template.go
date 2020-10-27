@@ -52,3 +52,11 @@ func (t *Template) parseText(data map[string]string) (string, error) {
 
 	return tplBytes.String(), nil
 }
+
+func (t *Template) Reset() {
+	t.ID = 0
+	t.Name = utils.EmptyStr
+	t.Title = utils.EmptyStr
+	t.Message = utils.EmptyStr
+	t.HTML = false
+}

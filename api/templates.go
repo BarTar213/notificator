@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/BarTar213/notificator/email"
 	"github.com/BarTar213/notificator/models"
@@ -23,16 +24,18 @@ const (
 )
 
 type TemplateHandlers struct {
-	storage     storage.Storage
-	emailClient email.Client
-	logger      *log.Logger
+	storage      storage.Storage
+	emailClient  email.Client
+	templatePool *sync.Pool
+	logger       *log.Logger
 }
 
-func NewTemplateHandlers(storage storage.Storage, emailCli email.Client, logger *log.Logger) *TemplateHandlers {
+func NewTemplateHandlers(storage storage.Storage, emailCli email.Client, pool *sync.Pool, logger *log.Logger) *TemplateHandlers {
 	return &TemplateHandlers{
-		storage:     storage,
-		emailClient: emailCli,
-		logger:      logger,
+		storage:      storage,
+		emailClient:  emailCli,
+		templatePool: pool,
+		logger:       logger,
 	}
 }
 
@@ -43,7 +46,10 @@ func (h *TemplateHandlers) GetTemplate(c *gin.Context) {
 		return
 	}
 
-	template := &models.Template{ID: id}
+	template := h.templatePool.Get().(*models.Template)
+	defer h.returnTemplate(template)
+
+	template.ID = id
 	err = h.storage.GetTemplate(template)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, templateResource)
@@ -60,7 +66,9 @@ func (h *TemplateHandlers) UpdateTemplate(c *gin.Context) {
 		return
 	}
 
-	template := &models.Template{}
+	template := h.templatePool.Get().(*models.Template)
+	defer h.returnTemplate(template)
+
 	err = c.ShouldBindJSON(template)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &models.Response{Error: invalidRequestBodyErr})
@@ -79,7 +87,9 @@ func (h *TemplateHandlers) UpdateTemplate(c *gin.Context) {
 }
 
 func (h *TemplateHandlers) AddTemplate(c *gin.Context) {
-	template := &models.Template{}
+	template := h.templatePool.Get().(*models.Template)
+	defer h.returnTemplate(template)
+
 	err := c.ShouldBindJSON(template)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &models.Response{Error: invalidRequestBodyErr})
@@ -134,7 +144,9 @@ func (h *TemplateHandlers) SendFromTemplate(c *gin.Context) {
 		return
 	}
 
-	template := &models.Template{Name: name}
+	template := h.templatePool.Get().(*models.Template)
+
+	template.Name = name
 	err := h.storage.GetTemplateByName(template)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, templateResource)
@@ -170,6 +182,8 @@ func (h *TemplateHandlers) SendFromTemplate(c *gin.Context) {
 }
 
 func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *models.Template) {
+	defer h.returnTemplate(template)
+
 	message, err := template.Parse(sender.Data)
 	if err != nil {
 		h.logger.Printf("template parse: %s", err)
@@ -184,6 +198,8 @@ func (h *TemplateHandlers) SendInternal(sender *senders.Internal, template *mode
 }
 
 func (h *TemplateHandlers) SendEmail(sender *senders.Email, template *models.Template) {
+	defer h.returnTemplate(template)
+
 	message, err := template.Parse(sender.Data)
 	if err != nil {
 		h.logger.Printf("template parse: %s", err)

@@ -54,10 +54,10 @@ Content-Type: application/json
 
 {
   "recipients": [
-    "example@example.com"
+    "email@gmail.com"
   ],
   "data": {
-    "user": "Mateusz",
+    "user": "user",
     "userId": "2",
     "code": "1235"
   }

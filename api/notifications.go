@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/BarTar213/notificator/models"
 	"github.com/BarTar213/notificator/storage"
@@ -15,12 +16,17 @@ const (
 )
 
 type NotificationHandlers struct {
-	storage storage.Storage
-	logger  *log.Logger
+	storage          storage.Storage
+	notificationPool *sync.Pool
+	logger           *log.Logger
 }
 
-func NewNotificationHandlers(storage storage.Storage, logger *log.Logger) *NotificationHandlers {
-	return &NotificationHandlers{storage: storage, logger: logger}
+func NewNotificationHandlers(storage storage.Storage, pool *sync.Pool, logger *log.Logger) *NotificationHandlers {
+	return &NotificationHandlers{
+		storage:          storage,
+		notificationPool: pool,
+		logger:           logger,
+	}
 }
 
 func (h *NotificationHandlers) GetNotification(c *gin.Context) {
@@ -29,8 +35,10 @@ func (h *NotificationHandlers) GetNotification(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, invalidIdParamErr)
 		return
 	}
+	notification := h.notificationPool.Get().(*models.Notification)
+	defer h.returnNotification(notification)
 
-	notification := &models.Notification{ID: id}
+	notification.ID = id
 	err = h.storage.GetNotification(notification)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)

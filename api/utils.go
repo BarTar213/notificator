@@ -44,3 +44,13 @@ func handlePostgresError(c *gin.Context, l *log.Logger, err error, resource stri
 
 	c.JSON(http.StatusInternalServerError, models.Response{Error: "storage error"})
 }
+
+func (h *NotificationHandlers) returnNotification(n *models.Notification) {
+	n.Reset()
+	h.notificationPool.Put(n)
+}
+
+func (h *TemplateHandlers) returnTemplate(t *models.Template) {
+	t.Reset()
+	h.templatePool.Put(t)
+}

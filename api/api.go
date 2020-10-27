@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/BarTar213/notificator/middleware"
 	"github.com/BarTar213/notificator/models"
 	"log"
 	"net/http"
@@ -95,6 +96,8 @@ func NewApi(options ...func(api *Api)) *Api {
 
 	notifications := a.Router.Group("/notifications")
 	{
+		notifications.Use(middleware.CheckAccount())
+
 		notifications.GET("/:id", nh.GetNotification)
 		notifications.GET("", nh.ListNotifications)
 		notifications.PATCH("/:id", nh.UpdateNotification)

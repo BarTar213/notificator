@@ -54,3 +54,10 @@ func (h *TemplateHandlers) returnTemplate(t *models.Template) {
 	t.Reset()
 	h.templatePool.Put(t)
 }
+
+//returns account information for user
+//should be only used in handler functions that using middleware CheckAccount function
+func GetAccount(c *gin.Context) *models.Account {
+	account := c.Keys["account"].(models.Account)
+	return &account
+}

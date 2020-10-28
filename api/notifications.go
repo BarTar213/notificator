@@ -38,7 +38,10 @@ func (h *NotificationHandlers) GetNotification(c *gin.Context) {
 	notification := h.notificationPool.Get().(*models.Notification)
 	defer h.returnNotification(notification)
 
+	account := GetAccount(c)
+
 	notification.ID = id
+	notification.UserID = account.ID
 	err = h.storage.GetNotification(notification)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)
@@ -61,7 +64,8 @@ func (h *NotificationHandlers) UpdateNotification(c *gin.Context) {
 		return
 	}
 
-	err = h.storage.ReadNotification(id, read)
+	account := GetAccount(c)
+	err = h.storage.ReadNotification(id, account.ID, read)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)
 		return
@@ -77,7 +81,8 @@ func (h *NotificationHandlers) DeleteNotification(c *gin.Context) {
 		return
 	}
 
-	err = h.storage.DeleteNotification(id)
+	account := GetAccount(c)
+	err = h.storage.DeleteNotification(id, account.ID)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)
 		return
@@ -87,7 +92,8 @@ func (h *NotificationHandlers) DeleteNotification(c *gin.Context) {
 }
 
 func (h *NotificationHandlers) ListNotifications(c *gin.Context) {
-	notifications, err := h.storage.ListNotifications()
+	account := GetAccount(c)
+	notifications, err := h.storage.ListNotifications(account.ID)
 	if err != nil {
 		handlePostgresError(c, h.logger, err, notificationResource)
 		return

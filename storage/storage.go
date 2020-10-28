@@ -26,11 +26,11 @@ type Storage interface {
 	ListTemplates() ([]models.Template, error)
 
 	GetNotification(notification *models.Notification) error
-	ReadNotification(id int, read bool) error
+	ReadNotification(notificationID, userID int, read bool) error
 	AddNotification(notification *models.Notification) error
 	BatchAddNotifications(notifications []*models.Notification) error
-	DeleteNotification(id int) error
-	ListNotifications() ([]models.Notification, error)
+	DeleteNotification(notificationID, userID int) error
+	ListNotifications(userID int) ([]models.Notification, error)
 }
 
 func NewPostgres(config *config.Postgres) (Storage, error) {

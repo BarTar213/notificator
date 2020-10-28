@@ -1,12 +1,18 @@
-GET http://localhost:8082/notifications/1
+GET http://localhost:8082/notifications/2
 Accept: application/json
+X-Account: login
+X-Account-Id: 1
 
 ###
 GET http://localhost:8082/notifications
 Accept: application/json
+X-Account: login
+X-Account-Id: 1
 
 ###
-PATCH http://localhost:8082/notifications/1?read=true
+PATCH http://localhost:8082/notifications/2?read=true
 Accept: application/json
+X-Account: login
+X-Account-Id: 1
 
 ###

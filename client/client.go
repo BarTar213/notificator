@@ -21,12 +21,12 @@ type Notificator struct {
 	baseURL string
 }
 
-func New(address string, port int, timeout time.Duration) Client {
+func New(address string, timeout time.Duration) Client {
 	return &Notificator{
 		client: &http.Client{
 			Timeout: timeout,
 		},
-		baseURL: fmt.Sprintf("%s:%d", address, port),
+		baseURL: address,
 	}
 }
 
@@ -39,7 +39,7 @@ func (n *Notificator) SendEmail(ctx context.Context, templateName string, email 
 }
 
 func (n *Notificator) send(ctx context.Context, templateName string, internal interface{}, senderType string) (int, *models.Response, error) {
-	url := fmt.Sprintf("%s/%s/send?type=%s", n.baseURL, templateName, senderType)
+	url := fmt.Sprintf("http://%s/%s/send?type=%s", n.baseURL, templateName, senderType)
 	resp, err := n.executeRequest(ctx, http.MethodPost, url, internal)
 	if err != nil {
 		return http.StatusInternalServerError, nil, err

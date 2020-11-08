@@ -39,7 +39,7 @@ func (n *Notificator) SendEmail(ctx context.Context, templateName string, email 
 }
 
 func (n *Notificator) send(ctx context.Context, templateName string, internal interface{}, senderType string) (int, *models.Response, error) {
-	url := fmt.Sprintf("http://%s/%s/send?type=%s", n.baseURL, templateName, senderType)
+	url := fmt.Sprintf("http://%s/templates/%s/send?type=%s", n.baseURL, templateName, senderType)
 	resp, err := n.executeRequest(ctx, http.MethodPost, url, internal)
 	if err != nil {
 		return http.StatusInternalServerError, nil, err

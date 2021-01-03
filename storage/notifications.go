@@ -28,7 +28,7 @@ func (p *Postgres) BatchAddNotifications(notifications []*models.Notification) e
 }
 
 func (p *Postgres) DeleteNotification(notificationID, userID int) error {
-	_, err := p.db.Exec("DELETE FROM templates WHERE id=? AND user_id=?", notificationID, userID)
+	_, err := p.db.Exec("DELETE FROM notifications WHERE id=? AND user_id=?", notificationID, userID)
 
 	return err
 }

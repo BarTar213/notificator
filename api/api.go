@@ -1,14 +1,14 @@
 package api
 
 import (
-	"github.com/BarTar213/notificator/middleware"
-	"github.com/BarTar213/notificator/models"
 	"log"
 	"net/http"
 	"sync"
 
 	"github.com/BarTar213/notificator/config"
 	"github.com/BarTar213/notificator/email"
+	"github.com/BarTar213/notificator/middleware"
+	"github.com/BarTar213/notificator/models"
 	"github.com/BarTar213/notificator/storage"
 	"github.com/gin-gonic/gin"
 )

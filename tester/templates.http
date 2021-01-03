@@ -12,9 +12,9 @@ POST http://localhost:8082/templates
 Content-Type: application/json
 
 {
-  "name": "mailVerification",
-  "message": "",
-  "HTML": true
+  "name": "commentLike",
+  "message": "User {{.user}} liked your comment",
+  "HTML": false
 }
 
 ###
@@ -35,17 +35,19 @@ Accept: application/json
 
 ###
 
-POST http://localhost:8082/templates/auth/send?type=internal
+POST http://localhost:8082/templates/commentLike/send?type=internal
 Content-Type: application/json
 
 {
-  "resource_id": 1,
-  "tag": "account",
+  "resource": "comment",
+  "resource_id": 26,
+  "tag": "movie/299534",
   "recipients": [
-    1,
-    2
+    3
   ],
-  "data": {}
+  "data": {
+    "user": "User"
+  }
 }
 
 ###

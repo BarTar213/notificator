@@ -8,10 +8,11 @@ import (
 )
 
 type Internal struct {
-	ResourceID   int               `json:"resource_id"`
-	Tag          string            `json:"tag"`
-	Recipients   []int             `json:"recipients"`
-	Data         map[string]string `json:"data"`
+	ResourceID int               `json:"resource_id"`
+	Resource   string            `json:"resource"`
+	Tag        string            `json:"tag"`
+	Recipients []int             `json:"recipients"`
+	Data       map[string]string `json:"data"`
 }
 
 func (i *Internal) Send(s storage.Storage, message string) error {
@@ -22,6 +23,7 @@ func (i *Internal) Send(s storage.Storage, message string) error {
 		notifications[j] = &models.Notification{
 			Message:    message,
 			UserID:     i.Recipients[j],
+			Resource:   i.Resource,
 			ResourceID: i.ResourceID,
 			Tag:        i.Tag,
 			CreateDate: createDate,
